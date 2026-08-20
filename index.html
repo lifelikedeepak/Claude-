@@ -1,0 +1,831 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Modern scroll animation website with Three.js 3D graphics">
+    <title>Corseco - Scroll Animation Website</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        html {
+            scroll-behavior: smooth;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Inter', Roboto, sans-serif;
+            background: #0b2340;
+            color: #ffffff;
+            overflow-x: hidden;
+            line-height: 1.6;
+        }
+
+        /* ============================================
+           HERO SECTION
+           ============================================ */
+        .hero {
+            height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            overflow: hidden;
+            background: linear-gradient(135deg, #0b2340 0%, #0f2e4a 100%);
+        }
+
+        .hero::before {
+            content: '';
+            position: absolute;
+            width: 500px;
+            height: 500px;
+            background: radial-gradient(circle, rgba(30, 77, 139, 0.4), rgba(11, 35, 64, 0.1));
+            border-radius: 50%;
+            filter: blur(80px);
+            top: -150px;
+            right: -150px;
+            animation: floatBlob 15s ease-in-out infinite;
+            will-change: transform;
+        }
+
+        .hero::after {
+            content: '';
+            position: absolute;
+            width: 400px;
+            height: 400px;
+            background: radial-gradient(circle, rgba(74, 158, 255, 0.15), rgba(11, 35, 64, 0.05));
+            border-radius: 50%;
+            filter: blur(60px);
+            bottom: -100px;
+            left: -100px;
+            animation: floatBlobAlt 18s ease-in-out infinite;
+            will-change: transform;
+        }
+
+        @keyframes floatBlob {
+            0%, 100% { transform: translate(0, 0); }
+            33% { transform: translate(40px, -40px); }
+            66% { transform: translate(-20px, 30px); }
+        }
+
+        @keyframes floatBlobAlt {
+            0%, 100% { transform: translate(0, 0); }
+            33% { transform: translate(-40px, 40px); }
+            66% { transform: translate(30px, -30px); }
+        }
+
+        .hero-content {
+            position: relative;
+            z-index: 10;
+            text-align: center;
+            max-width: 800px;
+            padding: 2rem;
+            opacity: 0;
+            animation: fadeInUp 1.2s cubic-bezier(0.25, 0.46, 0.45, 0.94) forwards;
+            will-change: opacity, transform;
+        }
+
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(60px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .hero h1 {
+            font-size: clamp(2.5rem, 8vw, 4.5rem);
+            font-weight: 800;
+            margin-bottom: 1.5rem;
+            line-height: 1.1;
+            letter-spacing: -0.02em;
+        }
+
+        .hero p {
+            font-size: clamp(1rem, 2vw, 1.35rem);
+            color: #b0b8c1;
+            margin-bottom: 2.5rem;
+            max-width: 600px;
+            line-height: 1.8;
+        }
+
+        .cta-button {
+            padding: 14px 42px;
+            background: linear-gradient(135deg, #4a9eff 0%, #3a8eef 100%);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+            box-shadow: 0 8px 24px rgba(74, 158, 255, 0.25);
+            will-change: transform, box-shadow;
+        }
+
+        .cta-button:hover {
+            background: linear-gradient(135deg, #3a8eef 0%, #2a7edf 100%);
+            transform: translateY(-4px);
+            box-shadow: 0 12px 32px rgba(74, 158, 255, 0.35);
+        }
+
+        .cta-button:active {
+            transform: translateY(-2px);
+        }
+
+        /* ============================================
+           HOW IT WORKS SECTION
+           ============================================ */
+        .how-it-works {
+            padding: 8rem 2rem;
+            background: linear-gradient(180deg, #0b2340 0%, #0f2e4a 100%);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .how-it-works::before {
+            content: '';
+            position: absolute;
+            width: 300px;
+            height: 300px;
+            background: radial-gradient(circle, rgba(74, 158, 255, 0.08), transparent);
+            border-radius: 50%;
+            top: 10%;
+            left: -150px;
+            filter: blur(60px);
+            pointer-events: none;
+        }
+
+        .section-title {
+            font-size: clamp(2rem, 5vw, 3.5rem);
+            margin-bottom: 4rem;
+            text-align: center;
+            opacity: 0;
+            font-weight: 800;
+            letter-spacing: -0.02em;
+        }
+
+        .section-title.in-view {
+            animation: fadeInUp 0.8s cubic-bezier(0.25, 0.46, 0.45, 0.94) forwards;
+        }
+
+        .cards-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+            gap: 2rem;
+            max-width: 1200px;
+            margin: 0 auto;
+            position: relative;
+            z-index: 5;
+        }
+
+        .card {
+            background: rgba(255, 255, 255, 0.04);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-radius: 14px;
+            padding: 2.5rem 2rem;
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            opacity: 0;
+            transform: translateY(50px);
+            transition: all 0.6s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+            will-change: opacity, transform, border-color, background;
+            position: relative;
+        }
+
+        .card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: radial-gradient(circle at 50% 50%, rgba(74, 158, 255, 0.05), transparent);
+            border-radius: 14px;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .card.in-view {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .card:nth-child(1).in-view { animation-delay: 0s; }
+        .card:nth-child(2).in-view { animation-delay: 0.1s; }
+        .card:nth-child(3).in-view { animation-delay: 0.2s; }
+        .card:nth-child(4).in-view { animation-delay: 0.3s; }
+
+        .card:hover {
+            background: rgba(255, 255, 255, 0.06);
+            border-color: rgba(74, 158, 255, 0.3);
+            transform: translateY(-12px);
+            box-shadow: 0 20px 40px rgba(74, 158, 255, 0.1);
+        }
+
+        .card:hover::before {
+            opacity: 1;
+        }
+
+        .card-icon {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 50px;
+            height: 50px;
+            background: linear-gradient(135deg, rgba(74, 158, 255, 0.15), rgba(30, 77, 139, 0.15));
+            border-radius: 10px;
+            margin-bottom: 1.5rem;
+            font-size: 1.5rem;
+        }
+
+        .card-number {
+            font-size: 2.5rem;
+            font-weight: 800;
+            background: linear-gradient(135deg, #4a9eff, #2a7edf);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 1rem;
+        }
+
+        .card h3 {
+            font-size: 1.3rem;
+            margin-bottom: 0.8rem;
+            font-weight: 700;
+            letter-spacing: -0.01em;
+        }
+
+        .card p {
+            color: #b0b8c1;
+            line-height: 1.7;
+            font-size: 0.95rem;
+        }
+
+        /* ============================================
+           THREE.JS CANVAS SECTION
+           ============================================ */
+        .canvas-section {
+            height: 100vh;
+            position: relative;
+            overflow: hidden;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: linear-gradient(135deg, #0b2340 0%, #0f2e4a 100%);
+        }
+
+        canvas {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            display: block;
+        }
+
+        .canvas-content {
+            position: relative;
+            z-index: 10;
+            text-align: center;
+            max-width: 700px;
+            padding: 2rem;
+            opacity: 0;
+            pointer-events: none;
+        }
+
+        .canvas-content.in-view {
+            animation: fadeInUp 0.8s cubic-bezier(0.25, 0.46, 0.45, 0.94) forwards;
+        }
+
+        .canvas-content h2 {
+            font-size: clamp(2rem, 4vw, 2.8rem);
+            margin-bottom: 1rem;
+            font-weight: 800;
+            letter-spacing: -0.02em;
+        }
+
+        .canvas-content p {
+            color: #b0b8c1;
+            font-size: 1.1rem;
+            line-height: 1.8;
+        }
+
+        /* ============================================
+           FOOTER SECTION
+           ============================================ */
+        .footer {
+            padding: 4rem 2rem;
+            text-align: center;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+            background: linear-gradient(180deg, #0b2340 0%, #051b2e 100%);
+            position: relative;
+            z-index: 5;
+        }
+
+        .footer p {
+            color: #b0b8c1;
+            font-size: 0.95rem;
+        }
+
+        .footer-links {
+            margin-top: 2rem;
+            display: flex;
+            justify-content: center;
+            gap: 2rem;
+        }
+
+        .footer-links a {
+            color: #4a9eff;
+            text-decoration: none;
+            transition: color 0.3s ease;
+        }
+
+        .footer-links a:hover {
+            color: #b0b8c1;
+        }
+
+        /* ============================================
+           SCROLL INDICATOR
+           ============================================ */
+        .scroll-indicator {
+            position: fixed;
+            bottom: 30px;
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: 100;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+            pointer-events: none;
+        }
+
+        .scroll-indicator.visible {
+            opacity: 1;
+        }
+
+        .scroll-dot {
+            width: 10px;
+            height: 10px;
+            background: #4a9eff;
+            border-radius: 50%;
+            box-shadow: 0 0 12px rgba(74, 158, 255, 0.6);
+            animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% {
+                transform: scale(1);
+                opacity: 0.6;
+            }
+            50% {
+                transform: scale(1.4);
+                opacity: 1;
+            }
+        }
+
+        /* ============================================
+           RESPONSIVE DESIGN
+           ============================================ */
+        @media (max-width: 1024px) {
+            .how-it-works {
+                padding: 6rem 2rem;
+            }
+
+            .cards-grid {
+                gap: 1.5rem;
+                grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+            }
+        }
+
+        @media (max-width: 768px) {
+            .hero {
+                padding: 2rem;
+            }
+
+            .hero h1 {
+                font-size: 2.2rem;
+            }
+
+            .hero p {
+                font-size: 1rem;
+                margin-bottom: 1.5rem;
+            }
+
+            .section-title {
+                font-size: 2rem;
+                margin-bottom: 2.5rem;
+            }
+
+            .how-it-works {
+                padding: 4rem 1.5rem;
+            }
+
+            .cards-grid {
+                grid-template-columns: 1fr;
+                gap: 1.2rem;
+            }
+
+            .card {
+                padding: 2rem 1.5rem;
+            }
+
+            .canvas-section {
+                height: 80vh;
+            }
+
+            .canvas-content h2 {
+                font-size: 2rem;
+            }
+
+            .canvas-content p {
+                font-size: 0.95rem;
+            }
+
+            .footer {
+                padding: 3rem 1.5rem;
+            }
+
+            .footer-links {
+                flex-wrap: wrap;
+                gap: 1rem;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .hero h1 {
+                font-size: 1.8rem;
+            }
+
+            .hero p {
+                font-size: 0.9rem;
+            }
+
+            .cta-button {
+                padding: 12px 32px;
+                font-size: 0.95rem;
+            }
+
+            .section-title {
+                font-size: 1.5rem;
+                margin-bottom: 2rem;
+            }
+
+            .card-number {
+                font-size: 2rem;
+            }
+
+            .card h3 {
+                font-size: 1.1rem;
+            }
+
+            .canvas-content h2 {
+                font-size: 1.5rem;
+            }
+        }
+
+        /* ============================================
+           ACCESSIBILITY & PERFORMANCE
+           ============================================ */
+        @media (prefers-reduced-motion: reduce) {
+            *,
+            *::before,
+            *::after {
+                animation-duration: 0.01ms !important;
+                animation-iteration-count: 1 !important;
+                transition-duration: 0.01ms !important;
+                scroll-behavior: auto !important;
+            }
+        }
+
+        /* GPU Acceleration */
+        .hero-content,
+        .card,
+        .canvas-content {
+            transform: translateZ(0);
+            backface-visibility: hidden;
+        }
+    </style>
+</head>
+<body>
+    <!-- ============================================
+         HERO SECTION
+         ============================================ -->
+    <section class="hero">
+        <div class="hero-content">
+            <h1>Build Something Amazing</h1>
+            <p>Experience smooth scroll animations with Three.js 3D graphics and modern design patterns</p>
+            <button class="cta-button">Get Started Today</button>
+        </div>
+    </section>
+
+    <!-- ============================================
+         HOW IT WORKS SECTION
+         ============================================ -->
+    <section class="how-it-works">
+        <h2 class="section-title">How It Works</h2>
+        <div class="cards-grid">
+            <div class="card">
+                <div class="card-number">01</div>
+                <h3>Scroll Trigger</h3>
+                <p>Elements automatically detect when they enter the viewport and trigger smooth animations using the Intersection Observer API.</p>
+            </div>
+            <div class="card">
+                <div class="card-number">02</div>
+                <h3>Smooth Animations</h3>
+                <p>GPU-accelerated CSS transforms deliver buttery 60fps animations across all modern browsers and devices.</p>
+            </div>
+            <div class="card">
+                <div class="card-number">03</div>
+                <h3>3D Graphics</h3>
+                <p>Three.js handles complex 3D scenes with interactive elements that respond dynamically to scroll position.</p>
+            </div>
+            <div class="card">
+                <div class="card-number">04</div>
+                <h3>Fully Responsive</h3>
+                <p>Adapts beautifully to all screen sizes while maintaining high performance on mobile and desktop devices.</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- ============================================
+         THREE.JS CANVAS SECTION
+         ============================================ -->
+    <section class="canvas-section">
+        <canvas id="canvas"></canvas>
+        <div class="canvas-content">
+            <h2>Interactive 3D</h2>
+            <p>Watch as 3D elements respond to your scroll position and create an immersive visual experience.</p>
+        </div>
+    </section>
+
+    <!-- ============================================
+         FOOTER SECTION
+         ============================================ -->
+    <footer class="footer">
+        <p>&copy; 2024 Corseco Animations. Built with Three.js, love, and modern web technologies.</p>
+        <div class="footer-links">
+            <a href="#" onclick="event.preventDefault()">Privacy</a>
+            <a href="#" onclick="event.preventDefault()">Terms</a>
+            <a href="#" onclick="event.preventDefault()">Contact</a>
+        </div>
+    </footer>
+
+    <!-- ============================================
+         SCROLL INDICATOR
+         ============================================ -->
+    <div class="scroll-indicator visible">
+        <div class="scroll-dot"></div>
+    </div>
+
+    <!-- Three.js CDN -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+
+    <script>
+        // ============================================
+        // SCROLL ANIMATION MANAGER
+        // ============================================
+        class ScrollAnimationManager {
+            constructor() {
+                this.observerOptions = {
+                    threshold: 0.15,
+                    rootMargin: '0px 0px -50px 0px'
+                };
+                this.init();
+            }
+
+            init() {
+                this.setupObserver();
+                this.collectElements();
+                this.setupScrollHandler();
+            }
+
+            setupObserver() {
+                this.observer = new IntersectionObserver((entries) => {
+                    entries.forEach(entry => {
+                        if (entry.isIntersecting) {
+                            // Trigger animation
+                            entry.target.classList.add('in-view');
+                            // Only unobserve after animation completes
+                            setTimeout(() => {
+                                this.observer.unobserve(entry.target);
+                            }, 1000);
+                        }
+                    });
+                }, this.observerOptions);
+            }
+
+            collectElements() {
+                // Collect all elements that should animate on scroll
+                document.querySelectorAll(
+                    '.section-title, .card, .canvas-content'
+                ).forEach(el => {
+                    this.observer.observe(el);
+                });
+            }
+
+            setupScrollHandler() {
+                // Hide scroll indicator when scrolled down
+                const indicator = document.querySelector('.scroll-indicator');
+
+                window.addEventListener('scroll', () => {
+                    if (window.scrollY > window.innerHeight * 0.5) {
+                        indicator.classList.remove('visible');
+                    } else {
+                        indicator.classList.add('visible');
+                    }
+                }, { passive: true });
+            }
+        }
+
+        // ============================================
+        // THREE.JS SCENE MANAGER
+        // ============================================
+        class ThreeJSSceneManager {
+            constructor(canvasElement) {
+                this.canvas = canvasElement;
+                this.width = window.innerWidth;
+                this.height = window.innerHeight;
+                this.animationFrameId = null;
+                this.isVisible = false;
+
+                this.setupScene();
+                this.setupIntersectionObserver();
+                this.setupResizeObserver();
+            }
+
+            setupScene() {
+                // Scene setup
+                this.scene = new THREE.Scene();
+                this.camera = new THREE.PerspectiveCamera(
+                    75,
+                    this.width / this.height,
+                    0.1,
+                    1000
+                );
+                this.renderer = new THREE.WebGLRenderer({
+                    canvas: this.canvas,
+                    alpha: true,
+                    antialias: true,
+                    powerPreference: 'high-performance'
+                });
+
+                this.renderer.setSize(this.width, this.height);
+                this.renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+                this.renderer.setClearColor(0x000000, 0);
+                this.camera.position.z = 4;
+
+                this.createObjects();
+                this.createLights();
+                this.startAnimation();
+            }
+
+            createObjects() {
+                // Create main rotating icosahedron
+                const geometry = new THREE.IcosahedronGeometry(1.8, 5);
+                const material = new THREE.MeshPhongMaterial({
+                    color: 0x4a9eff,
+                    emissive: 0x1e4d8b,
+                    shininess: 120,
+                    wireframe: false
+                });
+                this.icosahedron = new THREE.Mesh(geometry, material);
+                this.scene.add(this.icosahedron);
+
+                // Create orbit particles
+                this.createParticles();
+            }
+
+            createParticles() {
+                const particleCount = 50;
+                const geometry = new THREE.BufferGeometry();
+                const positions = [];
+
+                for (let i = 0; i < particleCount; i++) {
+                    const angle = (i / particleCount) * Math.PI * 2;
+                    const radius = 3;
+                    positions.push(
+                        Math.cos(angle) * radius,
+                        (Math.random() - 0.5) * 2,
+                        Math.sin(angle) * radius
+                    );
+                }
+
+                geometry.setAttribute('position', new THREE.BufferAttribute(new Float32Array(positions), 3));
+
+                const material = new THREE.PointsMaterial({
+                    color: 0x4a9eff,
+                    size: 0.08,
+                    opacity: 0.6
+                });
+
+                this.particles = new THREE.Points(geometry, material);
+                this.scene.add(this.particles);
+            }
+
+            createLights() {
+                // Key light (blue)
+                const light1 = new THREE.PointLight(0x4a9eff, 1.2, 100);
+                light1.position.set(5, 5, 5);
+                this.scene.add(light1);
+
+                // Fill light (dark blue)
+                const light2 = new THREE.PointLight(0x1e4d8b, 0.6, 100);
+                light2.position.set(-5, -3, 5);
+                this.scene.add(light2);
+
+                // Ambient light for global illumination
+                const ambientLight = new THREE.AmbientLight(0xffffff, 0.3);
+                this.scene.add(ambientLight);
+            }
+
+            startAnimation() {
+                const animate = () => {
+                    this.animationFrameId = requestAnimationFrame(animate);
+
+                    // Rotate icosahedron
+                    this.icosahedron.rotation.x += 0.004;
+                    this.icosahedron.rotation.y += 0.006;
+
+                    // Rotate particles in opposite direction
+                    if (this.particles) {
+                        this.particles.rotation.z += 0.001;
+                    }
+
+                    // Scale based on scroll
+                    const scrollProgress = window.scrollY / (document.documentElement.scrollHeight - window.innerHeight);
+                    this.icosahedron.position.y = Math.sin(scrollProgress * Math.PI) * 1.5;
+                    this.icosahedron.scale.y = 0.9 + Math.cos(scrollProgress * Math.PI) * 0.2;
+
+                    this.renderer.render(this.scene, this.camera);
+                };
+                animate();
+            }
+
+            setupIntersectionObserver() {
+                // Only render when canvas section is visible
+                const canvasSection = document.querySelector('.canvas-section');
+                const observer = new IntersectionObserver((entries) => {
+                    entries.forEach(entry => {
+                        if (entry.isIntersecting) {
+                            this.isVisible = true;
+                        } else {
+                            this.isVisible = false;
+                        }
+                    });
+                }, { threshold: 0.1 });
+
+                observer.observe(canvasSection);
+            }
+
+            setupResizeObserver() {
+                window.addEventListener('resize', () => this.handleResize(), { passive: true });
+            }
+
+            handleResize() {
+                this.width = window.innerWidth;
+                this.height = window.innerHeight;
+                this.camera.aspect = this.width / this.height;
+                this.camera.updateProjectionMatrix();
+                this.renderer.setSize(this.width, this.height);
+            }
+
+            destroy() {
+                if (this.animationFrameId) {
+                    cancelAnimationFrame(this.animationFrameId);
+                }
+                this.renderer.dispose();
+            }
+        }
+
+        // ============================================
+        // INITIALIZE ON DOM READY
+        // ============================================
+        document.addEventListener('DOMContentLoaded', () => {
+            // Initialize scroll animations
+            new ScrollAnimationManager();
+
+            // Initialize Three.js scene
+            const canvas = document.getElementById('canvas');
+            if (canvas) {
+                new ThreeJSSceneManager(canvas);
+            }
+
+            // Smooth scroll for CTA button
+            document.querySelector('.cta-button').addEventListener('click', () => {
+                document.querySelector('.how-it-works').scrollIntoView({ behavior: 'smooth' });
+            });
+        });
+
+        // Cleanup on page unload
+        window.addEventListener('beforeunload', () => {
+            // Optional: cleanup resources
+        });
+    </script>
+</body>
+</html>
